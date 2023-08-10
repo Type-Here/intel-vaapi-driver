@@ -54,6 +54,7 @@
   #undef SW_SCOREBOARD		// SW Scoreboard should be disabled for ILK and beyond
 #endif	// DEV_CTG
 #endif	// COMBINED_KERNEL
+
 //#define MONO				// Build Monochrome kernels
 
 //  Surface state definition
