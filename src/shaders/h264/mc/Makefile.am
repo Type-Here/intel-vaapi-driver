@@ -74,6 +74,7 @@ INTEL_MC_ASM =	\
 INTEL_MC_INC = \
 	AllAVC_Build.inc			\
 	AllAVC_Export.inc			\
+	export.inc				\
 	header.inc				\
 	HwmcOnlyHeader.inc			\
 	inter_Header.inc			\
