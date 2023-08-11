@@ -885,6 +885,10 @@ i965_validate_config(VADriverContextP ctx, VAProfile profile,
                     profile == VAProfileVP9Profile0 &&
                     entrypoint == VAEntrypointEncSliceLP)) {
             va_status = VA_STATUS_SUCCESS;
+        } else if (profile == VAProfileVP9Profile0 &&
+                   entrypoint == VAEntrypointVLD &&
+                   i965->wrapper_pdrvctx) {
+            va_status = VA_STATUS_SUCCESS;
         } else if (!HAS_VP9_DECODING_PROFILE(i965, profile) &&
                    !HAS_VP9_ENCODING(i965) &&
                    !HAS_LP_VP9_ENCODING(i965) &&
@@ -5883,15 +5887,7 @@ i965_GetSurfaceAttributes(
             attrib_list[i].flags = VA_SURFACE_ATTRIB_GETTABLE | VA_SURFACE_ATTRIB_SETTABLE;
 
             if (attrib_list[i].value.value.i == 0) {
-                if (IS_G4X(i965->intel.device_info)) {
-                    if (obj_config->profile == VAProfileMPEG2Simple ||
-                        obj_config->profile == VAProfileMPEG2Main) {
-                        attrib_list[i].value.value.i = VA_FOURCC_I420;
-                    } else {
-                        assert(0);
-                        attrib_list[i].flags = VA_SURFACE_ATTRIB_NOT_SUPPORTED;
-                    }
-                } else if (IS_IRONLAKE(i965->intel.device_info)) {
+                if (IS_G4X(i965->intel.device_info) || IS_IRONLAKE(i965->intel.device_info)) {
                     if (obj_config->profile == VAProfileMPEG2Simple ||
                         obj_config->profile == VAProfileMPEG2Main) {
                         attrib_list[i].value.value.i = VA_FOURCC_I420;
@@ -5917,18 +5913,7 @@ i965_GetSurfaceAttributes(
                         attrib_list[i].value.value.i = VA_FOURCC_NV12;
                 }
             } else {
-                if (IS_G4X(i965->intel.device_info)) {
-                    if (obj_config->profile == VAProfileMPEG2Simple ||
-                        obj_config->profile == VAProfileMPEG2Main) {
-                        if (attrib_list[i].value.value.i != VA_FOURCC_I420) {
-                            attrib_list[i].value.value.i = 0;
-                            attrib_list[i].flags &= ~VA_SURFACE_ATTRIB_SETTABLE;
-                        }
-                    } else {
-                        assert(0);
-                        attrib_list[i].flags = VA_SURFACE_ATTRIB_NOT_SUPPORTED;
-                    }
-                } else if (IS_IRONLAKE(i965->intel.device_info)) {
+                if (IS_G4X(i965->intel.device_info) || IS_IRONLAKE(i965->intel.device_info)) {
                     if (obj_config->profile == VAProfileMPEG2Simple ||
                         obj_config->profile == VAProfileMPEG2Main) {
                         if (attrib_list[i].value.value.i != VA_FOURCC_I420) {
@@ -6081,16 +6066,7 @@ i965_QuerySurfaceAttributes(VADriverContextP ctx,
     if (attribs == NULL)
         return VA_STATUS_ERROR_ALLOCATION_FAILED;
 
-    if (IS_G4X(i965->intel.device_info)) {
-        if (obj_config->profile == VAProfileMPEG2Simple ||
-            obj_config->profile == VAProfileMPEG2Main) {
-            attribs[i].type = VASurfaceAttribPixelFormat;
-            attribs[i].value.type = VAGenericValueTypeInteger;
-            attribs[i].flags = VA_SURFACE_ATTRIB_GETTABLE | VA_SURFACE_ATTRIB_SETTABLE;
-            attribs[i].value.value.i = VA_FOURCC_I420;
-            i++;
-        }
-    } else if (IS_IRONLAKE(i965->intel.device_info)) {
+    if (IS_G4X(i965->intel.device_info) || IS_IRONLAKE(i965->intel.device_info)) {
         switch (obj_config->profile) {
         case VAProfileMPEG2Simple:
         case VAProfileMPEG2Main:
